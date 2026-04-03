@@ -1,0 +1,663 @@
+---
+id: examples
+title: Examples
+---
+
+This page provides practical examples for common Dotter use cases.
+
+## Table of Contents
+
+**Basic**
+- [Basic Shell Configuration](#basic-shell-configuration)
+- [Conditional Configuration by OS](#conditional-configuration-by-os)
+- [Per-Machine Configuration](#per-machine-configuration)
+
+**Intermediate**
+- [Package Organization by Category](#package-organization-by-category)
+- [Git Configuration with User Details](#git-configuration-with-user-details)
+- [Using Hooks for Backup](#using-hooks-for-backup)
+- [Detecting Installed Programs](#detecting-installed-programs)
+- [Using Command Output in Templates](#using-command-output-in-templates)
+- [Complex Nested Variables](#complex-nested-variables)
+
+**Advanced**
+- [Include Directive for Shared Config](#include-directive-for-shared-config)
+- [System-wide Configuration (Unix)](#system-wide-configuration-unix)
+- [Watch Mode for Development](#watch-mode-for-development)
+- [Using Scripts as Helpers](#using-scripts-as-helpers)
+
+**General**
+- [Tips and Best Practices](#tips-and-best-practices)
+
+## Basic Shell Configuration
+
+A simple setup for managing shell configuration.
+
+### File Structure
+
+Pick the config files for the shells you actually use:
+
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   └── local.toml
+├── bashrc              # Bash
+├── zshrc               # Zsh
+├── fish_config.fish    # fish
+├── config.nu           # Nushell
+└── profile.ps1         # PowerShell
+```
+
+### global.toml
+
+```toml
+[default.files]
+"bashrc" = "~/.bashrc"
+"zshrc" = "~/.zshrc"
+"fish_config.fish" = "~/.config/fish/config.fish"
+"config.nu" = "~/.config/nushell/config.nu"
+"profile.ps1" = "~/.config/powershell/profile.ps1"
+```
+
+### local.toml
+```toml
+packages = ["default"]
+```
+
+## Conditional Configuration by OS
+
+Different configurations for Linux and macOS.
+
+### global.toml
+```toml
+[default.files]
+"bashrc" = { target = "~/.bashrc", type = "template" }
+
+[default.variables]
+# Common variables
+term = "xterm-256color"
+```
+
+### bashrc (template)
+```bash
+# ~/.bashrc - managed by Dotter
+
+TERM="{{term}}"
+
+{{#if dotter.linux}}
+# Linux-specific settings
+alias ls='ls --color=auto'
+export PATH="$HOME/.local/bin:$PATH"
+{{/if}}
+
+{{#if dotter.macos}}
+# macOS-specific settings
+alias ls='ls -G'
+export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+{{/if}}
+
+# Common settings
+set -o vi
+```
+
+Dotter automatically includes `dotter.linux` and `dotter.macos` as built-in variables. Note that these are determined at **compile time** (based on the OS the binary was built for), not at runtime.
+
+### fish config (template)
+
+The same OS-conditional pattern works for any shell:
+
+```fish
+# ~/.config/fish/config.fish - managed by Dotter
+
+{{#if dotter.linux}}
+# Linux-specific settings
+alias ls 'ls --color=auto'
+fish_add_path $HOME/.local/bin
+{{/if}}
+
+{{#if dotter.macos}}
+# macOS-specific settings
+alias ls 'ls -G'
+fish_add_path /usr/local/opt/coreutils/libexec/gnubin
+{{/if}}
+```
+
+### Nushell config (template)
+
+```nu
+# ~/.config/nushell/config.nu - managed by Dotter
+
+{{#if dotter.linux}}
+# Linux-specific settings
+$env.PATH = ($env.PATH | split row (char esep) | prepend ($env.HOME | path join ".local" "bin"))
+{{/if}}
+
+{{#if dotter.macos}}
+# macOS-specific settings
+$env.PATH = ($env.PATH | split row (char esep) | prepend "/usr/local/opt/coreutils/libexec/gnubin")
+{{/if}}
+```
+
+## Per-Machine Configuration
+
+Different settings for your laptop vs. desktop.
+
+### File Structure
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   ├── laptop.toml
+│   └── desktop.toml
+├── config/
+│   └── i3/
+│       └── config
+└── polybar/
+    └── config
+```
+
+### global.toml
+```toml
+[wm.files]
+"config/i3/config" = "~/.config/i3/config"
+"polybar/config" = "~/.config/polybar/config"
+```
+
+### laptop.toml
+```toml
+packages = ["wm"]
+
+[variables]
+machine = "laptop"
+battery_module = true
+ethernet_interface = "enp0s31f6"
+dpi = 96
+```
+
+### desktop.toml
+```toml
+packages = ["wm"]
+
+[variables]
+machine = "desktop"
+battery_module = false
+ethernet_interface = "eno1"
+dpi = 144
+```
+
+### config/i3/config (template)
+```text
+# i3 config for {{machine}}
+
+{{#if battery_module}}
+bar {
+    # Battery status for laptop
+    status_command i3status
+}
+{{/if}}
+
+# DPI setting
+font pango:monospace {{#if (eq dpi 144)}}12{{else}}10{{/if}}
+```
+
+## Package Organization by Category
+
+Organizing dotfiles into logical packages.
+
+### File Structure
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   └── local.toml
+├── shell/
+│   ├── bashrc
+│   └── zshrc
+├── editors/
+│   ├── vimrc
+│   └── config/
+│       └── nvim/
+├── git/
+│   ├── gitconfig
+│   └── gitignore_global
+└── terminals/
+    └── alacritty.yml
+```
+
+### global.toml
+```toml
+# Shell configuration
+[shell.files]
+"shell/bashrc" = "~/.bashrc"
+"shell/zshrc" = "~/.zshrc"
+
+[shell.variables]
+prompt_style = "powerline"
+
+# Editor configuration
+[editors]
+depends = ["shell"]
+
+[editors.files]
+"editors/vimrc" = "~/.vimrc"
+"editors/config/nvim" = "~/.config/nvim"
+
+[editors.variables]
+tab_width = 4
+use_spaces = true
+
+# Git configuration
+[git]
+depends = ["shell"]
+
+[git.files]
+"git/gitconfig" = { target = "~/.gitconfig", type = "template" }
+"git/gitignore_global" = "~/.gitignore_global"
+
+[git.variables]
+git_sign_commits = true
+
+# Terminal configuration
+[terminals.files]
+"terminals/alacritty.yml" = "~/.config/alacritty/alacritty.yml"
+```
+
+### local.toml
+```toml
+packages = ["shell", "editors", "git", "terminals"]
+
+[variables]
+# Override for this machine
+tab_width = 2
+git_sign_commits = false
+```
+
+## Git Configuration with User Details
+
+Sharing git config across machines while keeping personal details local.
+
+### global.toml
+```toml
+[git.files]
+"gitconfig" = { target = "~/.gitconfig", type = "template" }
+
+[git.variables]
+# These can be overridden in local.toml
+git_name = "Your Name"
+git_email = "your.email@example.com"
+git_signing_key = ""
+```
+
+### local.toml
+```toml
+packages = ["git"]
+
+[variables]
+git_name = "Jane Doe"
+git_email = "jane@work.com"
+git_signing_key = "ABCD1234"
+```
+
+### gitconfig (template)
+```ini
+[user]
+    name = {{git_name}}
+    email = {{git_email}}
+{{#if git_signing_key}}
+    signingkey = {{git_signing_key}}
+{{/if}}
+
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore_global
+
+[alias]
+    co = checkout
+    st = status
+    br = branch
+
+{{#if git_signing_key}}
+[commit]
+    gpgsign = true
+{{/if}}
+```
+
+## Using Hooks for Backup
+
+Automatically backup existing files before deploying.
+
+### File Structure
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   ├── local.toml
+│   └── pre_deploy.sh
+└── bashrc
+```
+
+### pre_deploy.sh
+```bash
+#!/bin/sh
+# Backup existing dotfiles before deploying
+
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
+
+for file in ~/.bashrc ~/.zshrc ~/.vimrc ~/.gitconfig; do
+    if [ -e "$file" ] && [ ! -L "$file" ]; then
+        mkdir -p "$BACKUP_DIR"
+        cp -v "$file" "$BACKUP_DIR/"
+    fi
+done
+```
+
+This script:
+- Creates a timestamped backup directory
+- Backs up any existing files that are not symlinks
+- Runs before Dotter deploys files
+
+## Detecting Installed Programs
+
+Conditionally include configuration based on installed software.
+
+### global.toml
+```toml
+[editors.files]
+"neovim" = { target = "~/.config/nvim", if = "(is_executable \"nvim\")" }
+"vim" = { target = "~/.vimrc", if = "(is_executable \"vim\")" }
+
+[terminals.files]
+"alacritty" = { target = "~/.config/alacritty", if = "(is_executable \"alacritty\")" }
+"kitty" = { target = "~/.config/kitty", if = "(is_executable \"kitty\")" }
+```
+
+Files are only deployed if the specified executable is found in your PATH.
+
+## Using Command Output in Templates
+
+Inject dynamic values into your configuration.
+
+### global.toml
+```toml
+[default.files]
+"bashrc" = { target = "~/.bashrc", type = "template" }
+```
+
+### bashrc (template)
+```bash
+# ~/.bashrc
+
+# Inject hostname
+HOSTNAME="{{command_output "hostname"}}"
+
+# Inject current user
+ME="{{command_output "whoami"}}"
+
+# Generate dynamic PS1
+PS1='[\u@{{command_output "hostname"}} \W]\$ '
+```
+
+## Complex Nested Variables
+
+Organizing configuration with nested structures.
+
+### global.toml
+```toml
+[default.files]
+"alacritty.yml" = { target = "~/.config/alacritty/alacritty.yml", type = "template" }
+
+[default.variables.theme]
+name = "dracula"
+background = "#282a36"
+foreground = "#f8f8f2"
+
+[default.variables.font]
+name = "FiraCode Nerd Font"
+size = 12
+
+[default.variables.terminal]
+opacity = 1.0
+padding_x = 10
+padding_y = 10
+```
+
+### alacritty.yml (template)
+```yaml
+font:
+  family: {{font.name}}
+  size: {{font.size}}
+
+colors:
+  name: {{theme.name}}
+  primary:
+    background: {{theme.background}}
+    foreground: {{theme.foreground}}
+
+window:
+  opacity: {{terminal.opacity}}
+  padding:
+    x: {{terminal.padding_x}}
+    y: {{terminal.padding_y}}
+```
+
+## Include Directive for Shared Config
+
+Sharing configuration across machines with includes.
+
+### File Structure
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   ├── shared.toml
+│   ├── laptop.toml
+│   └── workstation.toml
+└── ...
+```
+
+### global.toml
+```toml
+[default.files]
+"bashrc" = { target = "~/.bashrc", type = "template" }
+"vimrc" = "~/.vimrc"
+```
+
+### shared.toml
+```toml
+[default.variables]
+# Shared across all machines
+editor = "vim"
+term = "xterm-256color"
+```
+
+### laptop.toml
+```toml
+packages = ["default"]
+includes = ["shared.toml"]
+
+[variables]
+# Laptop-specific overrides
+font_size = 10
+battery_indicator = true
+```
+
+### workstation.toml
+```toml
+packages = ["default"]
+includes = ["shared.toml"]
+
+[variables]
+# Workstation-specific overrides
+font_size = 14
+battery_indicator = false
+```
+
+## System-wide Configuration (Unix)
+
+Deploying files outside your home directory.
+
+### global.toml
+```toml
+[system.files]
+# Requires running with sudo privileges
+"etc/hosts" = { target = "/etc/hosts", type = "template", owner = "root" }
+"etc/ssh_config" = { target = "/etc/ssh/ssh_config", owner = "root" }
+```
+
+### local.toml
+```toml
+packages = ["system"]
+
+[variables]
+domain = "local.home"
+```
+
+### etc/hosts (template)
+```text
+# /etc/hosts - Managed by Dotter
+127.0.0.1   localhost
+127.0.1.1   {{domain}}
+
+# Custom entries
+192.168.1.10  server.{{domain}}
+```
+
+When deploying files with `owner`, Dotter automatically uses `sudo` for file operations.
+
+## Watch Mode for Development
+
+Using watch mode while developing your dotfiles.
+
+### Start watching
+```bash
+cd ~/dotfiles
+dotter watch
+```
+
+### Typical workflow
+```bash
+# Terminal 1: Watch mode
+cd ~/dotfiles
+dotter watch
+
+# Terminal 2: Edit files
+vim shell/bashrc
+
+# Terminal 1: Shows deployment happening in real-time
+# [Dotter] Deploying...
+# INFO  [dotter] Deployed file "shell/bashrc" -> "~/.bashrc"
+```
+
+Changes are automatically deployed as you save files.
+
+## Using Scripts as Helpers
+
+Creating custom template helpers with scripts.
+
+### File Structure
+```text
+dotfiles/
+├── .dotter/
+│   ├── global.toml
+│   └── local.toml
+├── helpers/
+│   └── current_ip.sh
+└── config.yml
+```
+
+### global.toml
+```toml
+[helpers]
+current_ip = "helpers/current_ip.sh"
+
+[default.files]
+"config.yml" = { target = "~/.config/app/config.yml", type = "template" }
+```
+
+### helpers/current_ip.sh
+```bash
+#!/bin/sh
+# Returns the current public IP address
+curl -s "https://api.ipify.org"
+```
+
+### config.yml (template)
+```yaml
+server:
+  ip: {{current_ip}}
+  port: 8080
+```
+
+The helper is called during templating, and its output is inserted into the file.
+
+## Tips and Best Practices
+
+### Use Dry Run First
+
+Always preview changes before deploying:
+
+```bash
+dotter --dry-run -vv
+```
+
+### Keep Your Repository in Version Control
+
+```bash
+cd ~/dotfiles
+git init
+git add .
+git commit -m "Initial dotfiles setup"
+```
+
+### Separate Sensitive Information
+
+Do not commit passwords or API keys. Use local.toml for secrets:
+
+```toml
+# In local.toml (not committed)
+[variables]
+api_key = "secret123"
+password = "mypassword"
+```
+
+Add `*.toml` to `.gitignore` for local overrides:
+
+```text
+# .gitignore
+.dotter/local.toml
+.dotter/*-local.toml
+```
+
+### Use Comments in Config
+
+TOML supports comments for documentation:
+
+```toml
+[default.files]
+# Main shell configuration
+"bashrc" = "~/.bashrc"
+
+# Editor settings - templated because of conditional plugins
+"vimrc" = { target = "~/.vimrc", type = "template" }
+
+# This file is only deployed on Linux
+"linux-only" = { target = "~/.config/linux-only", if = "dotter.linux" }
+```
+
+### Test Configuration Changes
+
+```bash
+# Make changes to config
+vim .dotter/global.toml
+
+# Dry run to verify
+dotter --dry-run
+
+# If good, commit
+git add .dotter/global.toml
+git commit -m "Add new package"
+
+# Actually deploy
+dotter
+```
