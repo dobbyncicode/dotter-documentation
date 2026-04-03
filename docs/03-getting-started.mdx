@@ -3,6 +3,9 @@ id: getting-started
 title: Getting Started
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This guide walks you through setting up Dotter from scratch. We will build a real dotfiles repository together, step by step. By the end, you will have a working setup you can actually use.
 
 ## Before We Start
@@ -19,7 +22,7 @@ cd ~/dotfiles
 
 :::tip What if I use fish, Nushell, PowerShell, or another shell?
 
-This guide uses Bash and Zsh for examples because they are the most common. But Dotter does not care what shell you use. The configuration files (TOML) and templates (Handlebars) are shell-agnostic. Whether you use fish, Nushell, PowerShell, Elvish, Oil, or anything else — the concepts are identical. Just replace `.bashrc` with your shell's config file throughout this guide.
+This guide uses Bash for examples because it is the most common. But Dotter does not care what shell you use. The configuration files (TOML) and templates (Handlebars) are shell-agnostic. Whether you use fish, Nushell, PowerShell, Elvish, Oil, or anything else — the concepts are identical. Just replace `.bashrc` with your shell's config file throughout this guide.
 
 A quick reference for common shells:
 
@@ -86,16 +89,33 @@ Pick a config file you already use. It does not matter which one. Here are some 
 
 Pick one. Copy it into your dotfiles directory:
 
-```bash
-# Example for Bash
-cp ~/.bashrc ~/dotfiles/bashrc
-
-# Example for fish
-cp ~/.config/fish/config.fish ~/dotfiles/fish_config.fish
-
-# Example for Nushell
-cp ~/.config/nushell/config.nu ~/dotfiles/config.nu
-```
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+    ```bash
+    cp ~/.bashrc ~/dotfiles/bashrc
+    ```
+  </TabItem>
+  <TabItem value="zsh" label="Zsh">
+    ```bash
+    cp ~/.zshrc ~/dotfiles/zshrc
+    ```
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+    ```bash
+    cp ~/.config/fish/config.fish ~/dotfiles/fish_config.fish
+    ```
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+    ```bash
+    cp ~/.config/nushell/config.nu ~/dotfiles/config.nu
+    ```
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+    ```powershell
+    Copy-Item $PROFILE ~/dotfiles/profile.ps1
+    ```
+  </TabItem>
+</Tabs>
 
 Your directory now looks like this:
 
@@ -112,24 +132,38 @@ dotfiles/
 
 Open `.dotter/global.toml` in your editor. Replace the dummy entry with your actual file:
 
-```toml
-[default.files]
-"bashrc" = "~/.bashrc"
-```
-
-Or for fish:
-
-```toml
-[default.files]
-"fish_config.fish" = "~/.config/fish/config.fish"
-```
-
-Or for Nushell:
-
-```toml
-[default.files]
-"config.nu" = "~/.config/nushell/config.nu"
-```
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+    ```toml
+    [default.files]
+    "bashrc" = "~/.bashrc"
+    ```
+  </TabItem>
+  <TabItem value="zsh" label="Zsh">
+    ```toml
+    [default.files]
+    "zshrc" = "~/.zshrc"
+    ```
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+    ```toml
+    [default.files]
+    "fish_config.fish" = "~/.config/fish/config.fish"
+    ```
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+    ```toml
+    [default.files]
+    "config.nu" = "~/.config/nushell/config.nu"
+    ```
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+    ```toml
+    [default.files]
+    "profile.ps1" = "~/.config/powershell/profile.ps1"
+    ```
+  </TabItem>
+</Tabs>
 
 That is it. One line. The left side is the filename in your repository. The right side is where it should end up on your system.
 
@@ -149,20 +183,67 @@ INFO  [dotter] Deployed file "bashrc" -> "~/.bashrc"
 
 Verify it worked:
 
-```bash
-ls -la ~/.bashrc
-# Output: ~/.bashrc -> /home/you/dotfiles/bashrc
-```
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+    ```bash
+    ls -la ~/.bashrc
+    # Output: ~/.bashrc -> /home/you/dotfiles/bashrc
+    ```
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+    ```fish
+    ls -la ~/.config/fish/config.fish
+    # Output: ~/.config/fish/config.fish -> /home/you/dotfiles/fish_config.fish
+    ```
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+    ```nu
+    ls -la ~/.config/nushell/config.nu
+    # Output: ~/.config/nushell/config.nu -> /home/you/dotfiles/config.nu
+    ```
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+    ```powershell
+    Get-Item ~/.config/powershell/profile.ps1 | Select-Object Target
+    # Output: /home/you/dotfiles/profile.ps1
+    ```
+  </TabItem>
+</Tabs>
 
-Your config file is now a symlink pointing to your repository. Any change you make to `~/dotfiles/bashrc` takes effect immediately.
+Your config file is now a symlink pointing to your repository. Any change you make to the file in `~/dotfiles/` takes effect immediately.
 
 ### Try It
 
-```bash
-echo "# Hello from Dotter" >> ~/dotfiles/bashrc
-tail -1 ~/.bashrc
-# Output: # Hello from Dotter
-```
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+    ```bash
+    echo "# Hello from Dotter" >> ~/dotfiles/bashrc
+    tail -1 ~/.bashrc
+    # Output: # Hello from Dotter
+    ```
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+    ```fish
+    echo "# Hello from Dotter" >> ~/dotfiles/fish_config.fish
+    tail -1 ~/.config/fish/config.fish
+    # Output: # Hello from Dotter
+    ```
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+    ```nu
+    echo "# Hello from Dotter" | save -a ~/dotfiles/config.nu
+    open ~/dotfiles/config.nu | lines | last
+    # Output: # Hello from Dotter
+    ```
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+    ```powershell
+    "# Hello from Dotter" | Add-Content ~/dotfiles/profile.ps1
+    Get-Content ~/dotfiles/profile.ps1 -Tail 1
+    # Output: # Hello from Dotter
+    ```
+  </TabItem>
+</Tabs>
 
 It works. Your dotfile is managed.
 
@@ -186,32 +267,35 @@ The `[default.variables]` section defines variables you can use inside your file
 
 ### Use the Variable
 
-Open your config file in the repository (`bashrc`, `zshrc`, `config.fish`, whatever you picked) and add this line somewhere:
+Open your config file in the repository and add this line somewhere:
 
-```bash
-export EDITOR={{editor}}
-```
-
-:::tip For non-Bash/Zsh users
-
-The template syntax is the same regardless of your shell. Just place `{{editor}}` wherever you need the value:
-
-```fish
-# fish config
-set -gx EDITOR {{editor}}
-```
-
-```nu
-# Nushell config
-$env.EDITOR = "{{editor}}"
-```
-
-```powershell
-# PowerShell profile
-$env:EDITOR = "{{editor}}"
-```
-
-:::
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+    ```bash
+    export EDITOR={{editor}}
+    ```
+  </TabItem>
+  <TabItem value="zsh" label="Zsh">
+    ```bash
+    export EDITOR={{editor}}
+    ```
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+    ```fish
+    set -gx EDITOR {{editor}}
+    ```
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+    ```nu
+    $env.EDITOR = "{{editor}}"
+    ```
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+    ```powershell
+    $env:EDITOR = "{{editor}}"
+    ```
+  </TabItem>
+</Tabs>
 
 ### Deploy Again
 
@@ -352,7 +436,7 @@ dotfiles/
 ├── .dotter/
 │   ├── global.toml    # Package definitions
 │   ├── local.toml     # Selected packages for this machine
-│   └── cache.toml      # Deployment tracking
+│   └── cache.toml     # Deployment tracking
 ├── bashrc             # Your shell config (symlinked)
 └── gitconfig          # Your Git config (symlinked)
 ```
@@ -366,7 +450,7 @@ And you understand:
 
 ## Where to Go Next
 
-- **Want a complete, ready-to-use starting point?** Check the [Starter Config](starter-config) — a full configuration you can copy and customize.
+- **Want a complete, ready-to-use starting point?** Check the [Starter Config](starter-config) — a full multi-package configuration you can copy and customize. Unlike `dotter init`, which gives you a blank slate, the Starter Config includes shell, git, and editor packages with pre-defined variables and dependencies.
 - **Need the full command reference?** See [Usage](usage).
 - **Want to understand every configuration option?** Read the [Configuration Structure](config-structure) and [Template Reference](templates).
 - **Looking for patterns others use?** Browse the [Examples](examples).

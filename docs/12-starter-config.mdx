@@ -3,6 +3,9 @@ id: starter-config
 title: Starter Config
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 A complete, ready-to-use Dotter configuration you can copy, paste, and customize. This is the fastest way to get started if you want something that works out of the box.
 
 ## What This Gives You
@@ -31,6 +34,10 @@ mkdir -p shell
 mkdir -p git
 mkdir -p editor/nvim
 ```
+
+:::tip Why not just run `dotter init`?
+The `dotter init` command creates a blank configuration with a single "default" package. This starter config is more opinionated — it gives you a multi-package setup (`shell`, `git`, `editor`) with pre-defined variables, dependencies, and a directory structure you can customize. If you prefer to start from scratch, `dotter init` is the way to go. If you want something closer to a finished product, use this.
+:::
 
 ### 3. Create `global.toml`
 
@@ -104,7 +111,10 @@ Now create the actual config files. Pick the ones you need.
 
 #### Shell Config
 
-Create `shell/bashrc` (or `shell/zshrc`, `shell/fish_config`, etc.):
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+
+Create `shell/bashrc`:
 
 ```bash
 # ~/.bashrc — managed by Dotter
@@ -125,7 +135,34 @@ export EDITOR=nvim
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-For fish, create `shell/fish_config.fish`:
+  </TabItem>
+  <TabItem value="zsh" label="Zsh">
+
+Create `shell/zshrc`:
+
+```bash
+# ~/.zshrc — managed by Dotter
+
+# Prompt
+PS1='{{shell_prompt}}'
+
+# Colors
+{{#if enable_colors}}
+export LS_COLORS='di=34:fi=37:ln=36'
+alias ls='ls -G'
+{{/if}}
+
+# Editor
+export EDITOR=nvim
+
+# Path additions
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+
+Create `shell/fish_config.fish`:
 
 ```fish
 # ~/.config/fish/config.fish — managed by Dotter
@@ -149,7 +186,10 @@ set -gx EDITOR nvim
 fish_add_path $HOME/.local/bin
 ```
 
-For Nushell, create `shell/config_nu`:
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+
+Create `shell/config_nu`:
 
 ```nu
 # ~/.config/nushell/config.nu — managed by Dotter
@@ -160,6 +200,24 @@ $env.EDITOR = "nvim"
 # Path additions
 $env.PATH = ($env.PATH | split row (char esep) | prepend ($env.HOME | path join ".local" "bin"))
 ```
+
+  </TabItem>
+  <TabItem value="ps" label="PowerShell">
+
+Create `shell/profile.ps1`:
+
+```powershell
+# $PROFILE — managed by Dotter
+
+# Editor
+$env:EDITOR = "nvim"
+
+# Path additions
+$env:PATH = "$env:HOME/.local/bin;$env:PATH"
+```
+
+  </TabItem>
+</Tabs>
 
 #### Git Config
 

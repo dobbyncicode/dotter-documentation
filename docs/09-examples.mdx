@@ -3,6 +3,9 @@ id: examples
 title: Examples
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This page provides practical examples for common Dotter use cases.
 
 ## Table of Contents
@@ -79,7 +82,11 @@ Different configurations for Linux and macOS.
 term = "xterm-256color"
 ```
 
-### bashrc (template)
+### Shell config (template)
+
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+
 ```bash
 # ~/.bashrc - managed by Dotter
 
@@ -101,11 +108,8 @@ export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 set -o vi
 ```
 
-Dotter automatically includes `dotter.linux` and `dotter.macos` as built-in variables. Note that these are determined at **compile time** (based on the OS the binary was built for), not at runtime.
-
-### fish config (template)
-
-The same OS-conditional pattern works for any shell:
+  </TabItem>
+  <TabItem value="fish" label="Fish">
 
 ```fish
 # ~/.config/fish/config.fish - managed by Dotter
@@ -123,7 +127,8 @@ fish_add_path /usr/local/opt/coreutils/libexec/gnubin
 {{/if}}
 ```
 
-### Nushell config (template)
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
 
 ```nu
 # ~/.config/nushell/config.nu - managed by Dotter
@@ -138,6 +143,11 @@ $env.PATH = ($env.PATH | split row (char esep) | prepend ($env.HOME | path join 
 $env.PATH = ($env.PATH | split row (char esep) | prepend "/usr/local/opt/coreutils/libexec/gnubin")
 {{/if}}
 ```
+
+  </TabItem>
+</Tabs>
+
+Dotter automatically includes `dotter.linux` and `dotter.macos` as built-in variables. Note that these are determined at **compile time** (based on the OS the binary was built for), not at runtime.
 
 ## Per-Machine Configuration
 
@@ -384,7 +394,11 @@ Inject dynamic values into your configuration.
 "bashrc" = { target = "~/.bashrc", type = "template" }
 ```
 
-### bashrc (template)
+### Shell config (template)
+
+<Tabs groupId="shell" queryString="shell">
+  <TabItem value="bash" label="Bash" default>
+
 ```bash
 # ~/.bashrc
 
@@ -397,6 +411,35 @@ ME="{{command_output "whoami"}}"
 # Generate dynamic PS1
 PS1='[\u@{{command_output "hostname"}} \W]\$ '
 ```
+
+  </TabItem>
+  <TabItem value="fish" label="Fish">
+
+```fish
+# ~/.config/fish/config.fish
+
+# Inject hostname
+set -gx MY_HOSTNAME ({{command_output "hostname"}})
+
+# Inject current user
+set -gx MY_USER ({{command_output "whoami"}})
+```
+
+  </TabItem>
+  <TabItem value="nu" label="Nushell">
+
+```nu
+# ~/.config/nushell/config.nu
+
+# Inject hostname
+$env.MY_HOSTNAME = "{{command_output "hostname"}}"
+
+# Inject current user
+$env.MY_USER = "{{command_output "whoami"}}"
+```
+
+  </TabItem>
+</Tabs>
 
 ## Complex Nested Variables
 

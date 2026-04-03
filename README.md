@@ -20,8 +20,6 @@ npm install
 npm start
 ```
 
-The search bar will say the index is unavailable during development — that is normal. It only builds during `npm run build`, which is what Vercel runs in production.
-
 ## Built with
 
 [Docusaurus](https://docusaurus.io/)
