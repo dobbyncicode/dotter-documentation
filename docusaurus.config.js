@@ -10,8 +10,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Dotter',
-  tagline: 'A dotfile manager and templater written in Rust',
+  title: 'Dotter Docs',
+  tagline: 'Unofficial documentation for Dotter — a dotfile manager and templater written in Rust',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -57,6 +57,19 @@ const config = {
     ],
   ],
 
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      /** @type {import('@easyops-cn/docusaurus-search-local').PluginOptions} */
+      ({
+        hashed: true,
+        language: ['en'],
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+      }),
+    ],
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -66,7 +79,7 @@ const config = {
         respectPrefersColorScheme: true,
       },
       navbar: {
-        title: 'Dotter',
+        title: 'Dotter Docs',
         logo: {
           alt: 'Dotter Logo',
           src: 'img/logo.svg',
@@ -123,7 +136,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Dotter. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Dotter Docs. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,

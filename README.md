@@ -1,41 +1,27 @@
-# Website
+# Dotter Docs
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Unofficial documentation for [Dotter](https://github.com/SuperCuber/dotter) — a dotfile manager and templater written in Rust.
 
-## Installation
+## What is covered
 
-```bash
-yarn
-```
+- **Getting started** — step-by-step walkthrough from zero to deployed
+- **Starter config** — a complete, copy-paste configuration you can customize
+- **Configuration reference** — packages, files, variables, loading order, and merging rules
+- **Template reference** — Handlebars syntax, all helpers, strict mode, and edge cases
+- **Hooks** — pre/post deploy scripts and custom template helpers
+- **Examples** — real-world patterns for common use cases
+- **Migration guides** — coming from Stow, Chezmoi, RCM, or bare repos
+- **FAQ & troubleshooting** — answers to the questions that actually come up
 
-## Local Development
-
-```bash
-yarn start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-## Build
+## Running locally
 
 ```bash
-yarn build
+npm install
+npm start
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+The search bar will say the index is unavailable during development — that is normal. It only builds during `npm run build`, which is what Vercel runs in production.
 
-## Deployment
+## Built with
 
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+[Docusaurus](https://docusaurus.io/)

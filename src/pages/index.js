@@ -59,8 +59,8 @@ export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title="Dotter Documentation"
+      description="Unofficial documentation for Dotter, a dotfile manager and templater written in Rust. Get started with setup, configuration, and real-world examples.">
       <HomepageHeader />
       <main>
         <UnofficialDisclaimer />
