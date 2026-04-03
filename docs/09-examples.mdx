@@ -374,12 +374,12 @@ Conditionally include configuration based on installed software.
 ### global.toml
 ```toml
 [editors.files]
-"neovim" = { target = "~/.config/nvim", if = "(is_executable \"nvim\")" }
-"vim" = { target = "~/.vimrc", if = "(is_executable \"vim\")" }
+"neovim" = { target = "~/.config/nvim", type = "symbolic", if = "(is_executable \"nvim\")" }
+"vim" = { target = "~/.vimrc", type = "symbolic", if = "(is_executable \"vim\")" }
 
 [terminals.files]
-"alacritty" = { target = "~/.config/alacritty", if = "(is_executable \"alacritty\")" }
-"kitty" = { target = "~/.config/kitty", if = "(is_executable \"kitty\")" }
+"alacritty" = { target = "~/.config/alacritty", type = "symbolic", if = "(is_executable \"alacritty\")" }
+"kitty" = { target = "~/.config/kitty", type = "symbolic", if = "(is_executable \"kitty\")" }
 ```
 
 Files are only deployed if the specified executable is found in your PATH.
@@ -685,7 +685,7 @@ TOML supports comments for documentation:
 "vimrc" = { target = "~/.vimrc", type = "template" }
 
 # This file is only deployed on Linux
-"linux-only" = { target = "~/.config/linux-only", if = "dotter.linux" }
+"linux-only" = { target = "~/.config/linux-only", type = "symbolic", if = "dotter.linux" }
 ```
 
 ### Test Configuration Changes

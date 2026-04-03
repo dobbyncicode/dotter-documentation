@@ -3,7 +3,7 @@ id: quick-reference
 title: Quick Reference
 ---
 
-A condensed reference for when you know what you are doing and just need the syntax.
+When you know what you are doing and just need the syntax.
 
 ## Commands
 

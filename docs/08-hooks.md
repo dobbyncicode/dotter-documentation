@@ -62,10 +62,12 @@ echo "Deploying for user: {{username}}"
 # .dotter/pre_deploy.sh
 # Backup existing configs before deploying
 
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
+
 for file in ~/.bashrc ~/.vimrc; do
     if [ -f "$file" ] && [ ! -L "$file" ]; then
-        mkdir -p ~/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)
-        cp -v "$file" ~/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)/
+        mkdir -p "$BACKUP_DIR"
+        cp -v "$file" "$BACKUP_DIR/"
     fi
 done
 ```

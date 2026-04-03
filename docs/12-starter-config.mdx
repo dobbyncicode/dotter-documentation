@@ -53,10 +53,11 @@ Create `.dotter/global.toml`:
 
 [shell.files]
 # Pick ONE of the following lines and rename the source file to match your shell:
-# "shell/bashrc"        = "~/.bashrc"
-# "shell/zshrc"         = "~/.zshrc"
-# "shell/fish_config"   = "~/.config/fish/config.fish"
-# "shell/config_nu"     = "~/.config/nushell/config.nu"
+# "shell/bashrc"             = "~/.bashrc"
+# "shell/zshrc"              = "~/.zshrc"
+# "shell/fish_config.fish"   = "~/.config/fish/config.fish"
+# "shell/config.nu"          = "~/.config/nushell/config.nu"
+# "shell/profile.ps1"        = "~/.config/powershell/profile.ps1"
 
 [shell.variables]
 # Common shell variables — customize these
@@ -189,7 +190,7 @@ fish_add_path $HOME/.local/bin
   </TabItem>
   <TabItem value="nu" label="Nushell">
 
-Create `shell/config_nu`:
+Create `shell/config.nu`:
 
 ```nu
 # ~/.config/nushell/config.nu — managed by Dotter

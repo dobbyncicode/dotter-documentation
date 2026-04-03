@@ -172,7 +172,7 @@ Check if a command exists in your PATH.
 
 **Signature**: `{{is_executable command_name}}`
 
-**Returns**: `"true"` if the command is found, `"false"` otherwise.
+**Returns**: `"true"` if the command is found, empty string otherwise. This means the helper is designed for use with `{{#if}}` — the empty string is falsy in Handlebars, so `{{#if (is_executable "vim")}}` works correctly.
 
 **Error behavior**: Returns an error if no argument is given or more than one argument is given.
 
@@ -188,7 +188,7 @@ Run a shell command and check if it succeeds.
 
 **Signature**: `{{command_success command}}`
 
-**Returns**: `"true"` if the command exits with status 0, `"false"` otherwise.
+**Returns**: `"true"` if the command exits with status 0, empty string otherwise. Like `is_executable`, this is designed for use with `{{#if}}`.
 
 **Error behavior**: Returns an error if no argument is given or more than one argument is given. The command is run via `sh -c`.
 

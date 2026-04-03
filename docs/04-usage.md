@@ -222,7 +222,7 @@ dotter init
 ```
 
 This creates:
-- `.dotter/global.toml` with a "default" package containing all non-hidden files in the current directory
+- `.dotter/global.toml` with an empty "default" package (files in the current directory are added to `[default.files]`)
 - `.dotter/local.toml` selecting the "default" package
 - `.dotter/cache.toml` (empty)
 
@@ -330,18 +330,6 @@ Dotter exits with:
 - `0`: Success
 - `1`: Error occurred
 
-## Warnings
-
-### Running as Root
-
-If you run Dotter as `root` (detected via the `USER` environment variable) and your global config file is owned by a different user, Dotter emits a warning:
-
-```
-WARN It is not recommended to run Dotter as root, since the cache files and all files not marked with an `owner` field will default to being owned by root.
-```
-
-If you are genuinely logged in as root, this is safe to ignore. Otherwise, run `dotter undeploy` as root, remove the cache files, and use Dotter as a regular user.
-
 This makes it easy to use in scripts:
 
 ```bash
@@ -353,6 +341,18 @@ else
     exit 1
 fi
 ```
+
+## Warnings
+
+### Running as Root
+
+If you run Dotter as `root` (detected via the `USER` environment variable) and your global config file is owned by a different user, Dotter emits a warning:
+
+```
+WARN It is not recommended to run Dotter as root, since the cache files and all files not marked with an `owner` field will default to being owned by root.
+```
+
+If you are genuinely logged in as root, this is safe to ignore. Otherwise, run `dotter undeploy` as root, remove the cache files, and use Dotter as a regular user.
 
 ## Common Patterns
 
